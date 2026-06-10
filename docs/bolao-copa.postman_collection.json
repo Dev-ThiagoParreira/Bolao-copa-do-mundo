@@ -1,0 +1,74 @@
+{
+  "info": {
+    "name": "Bolao Copa API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"joao@bolao.com\",\n  \"senha\": \"usuario123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Auth Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Maria Souza\",\n  \"cpf\": \"33333333333\",\n  \"email\": \"maria@bolao.com\",\n  \"telefone\": \"11977776666\",\n  \"senha\": \"maria123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Listar Campanhas",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/campanhas"
+      }
+    },
+    {
+      "name": "Criar Aposta",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/apostas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campanhaOpcaoId\": 1,\n  \"meioPagamentoId\": 1,\n  \"comprovante\": \"pix-demo-001\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Forcar Erro Campanha Invalida",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+        ],
+        "url": "{{baseUrl}}/campanhas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Campanha inválida\",\n  \"dtInicio\": \"2026-12-31\",\n  \"dtFim\": \"2026-01-01\",\n  \"taxaOperacional\": 1,\n  \"valorBolao\": 10,\n  \"codigoCampanha\": \"ERRO-DEMO\",\n  \"tipoCampanhaId\": 9999\n}"
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3333/api" },
+    { "key": "token", "value": "" },
+    { "key": "tokenAdmin", "value": "" }
+  ]
+}

@@ -1,0 +1,51 @@
+:root {
+  --primary: #003c4b;
+  --secondary: #4196c6;
+  --success: #198754;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --bg: #f4f7f9;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: #1f2937;
+}
+
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.card-shadow {
+  box-shadow: 0 8px 24px rgba(0, 60, 75, 0.08);
+  border: none;
+}
+
+.badge-status {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.hero-banner {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.calendar-card {
+  border-left: 4px solid var(--secondary);
+}
+
+.notification-toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2000;
+  min-width: 280px;
+}

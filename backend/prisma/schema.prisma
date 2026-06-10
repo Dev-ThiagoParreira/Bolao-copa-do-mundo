@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StatusGeral {
+  ATIVO
+  INATIVO
+}
+
+enum StatusCampanha {
+  ABERTA
+  ENCERRADA
+  APURADA
+  INATIVA
+}
+
+enum TipoUsuario {
+  ADMIN
+  USUARIO
+}
+
+enum StatusAposta {
+  PENDENTE
+  CONFIRMADA
+  CANCELADA
+}
+
+model TipoCampanha {
+  id        Int        @id @default(autoincrement())
+  descricao String
+  status    StatusGeral @default(ATIVO)
+  campanhas Campanha[]
+
+  @@map("tipo_campanha")
+}
+
+model Campanha {
+  id               Int            @id @default(autoincrement())
+  nome             String
+  dtInicio         DateTime       @map("dt_inicio")
+  dtFim            DateTime       @map("dt_fim")
+  taxaOperacional  Decimal        @map("taxa_operacional") @db.Decimal(10, 2)
+  valorBolao       Decimal        @map("valor_bolao") @db.Decimal(10, 2)
+  codigoCampanha   String         @unique @map("codigo_campanha")
+  status           StatusCampanha @default(ABERTA)
+  tipoCampanhaId   Int            @map("tipo_campanha_id")
+  tipoCampanha     TipoCampanha   @relation(fields: [tipoCampanhaId], references: [id])
+  opcoes           CampanhaOpcao[]
+
+  @@map("campanha")
+}
+
+model CampanhaOpcao {
+  id               Int          @id @default(autoincrement())
+  descricao        String
+  campanhaId       Int          @map("campanha_id")
+  ehResultadoFinal Boolean      @default(false) @map("eh_resultado_final")
+  status           StatusGeral  @default(ATIVO)
+  campanha         Campanha     @relation(fields: [campanhaId], references: [id])
+  apostas          Aposta[]
+
+  @@unique([campanhaId, descricao])
+  @@map("campanha_opcoes")
+}
+
+model Usuario {
+  id          Int         @id @default(autoincrement())
+  nome        String
+  cpf         String      @unique
+  email       String      @unique
+  telefone    String?
+  tipoUsuario TipoUsuario @default(USUARIO) @map("tipo_usuario")
+  senha       String
+  status      StatusGeral @default(ATIVO)
+  apostas     Aposta[]
+
+  @@map("usuario")
+}
+
+model MeioPagamento {
+  id                  Int          @id @default(autoincrement())
+  descricao           String
+  status              StatusGeral  @default(ATIVO)
+  comprovanteObrigatorio Boolean   @default(false) @map("comprovante_obrigatorio")
+  apostas             Aposta[]
+
+  @@map("meio_pagamento")
+}
+
+model Aposta {
+  id              Int           @id @default(autoincrement())
+  usuarioId       Int           @map("usuario_id")
+  dtCriacao       DateTime      @default(now()) @map("dt_criacao")
+  comprovante     String?
+  meioPagamentoId Int           @map("meio_pagamento_id")
+  campanhaOpcaoId Int           @map("campanha_opcao_id")
+  status          StatusAposta  @default(PENDENTE)
+  usuario         Usuario       @relation(fields: [usuarioId], references: [id])
+  meioPagamento   MeioPagamento @relation(fields: [meioPagamentoId], references: [id])
+  campanhaOpcao   CampanhaOpcao @relation(fields: [campanhaOpcaoId], references: [id])
+
+  @@map("aposta")
+}
