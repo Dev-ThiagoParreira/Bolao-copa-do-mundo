@@ -52,6 +52,9 @@ async function main() {
     },
   });
 
+  const COMPROVANTE_DEMO_BASE64 =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNk+M9Qz0AEYBxVSF+FABJADveWkH6oAAAAAElFTkSuQmCC';
+
   const pix = await prisma.meioPagamento.create({
     data: {
       descricao: 'PIX',
@@ -70,12 +73,14 @@ async function main() {
 
   const campanhaFinal = await prisma.campanha.create({
     data: {
-      nome: 'Final da Copa 2026',
+      nome: 'Brasil x Argentina',
+      timeA: 'Brasil',
+      timeB: 'Argentina',
       dtInicio: new Date('2026-06-01T00:00:00.000Z'),
       dtFim: new Date('2026-07-19T23:59:59.000Z'),
       taxaOperacional: 5.0,
       valorBolao: 50.0,
-      codigoCampanha: 'COPA2026-FINAL',
+      codigoCampanha: 'COPA-BRA-ARG',
       status: 'ABERTA',
       tipoCampanhaId: tipoCopa.id,
     },
@@ -83,12 +88,14 @@ async function main() {
 
   const campanhaEncerrada = await prisma.campanha.create({
     data: {
-      nome: 'Semifinal Encerrada',
+      nome: 'Alemanha x França',
+      timeA: 'Alemanha',
+      timeB: 'França',
       dtInicio: new Date('2026-05-01T00:00:00.000Z'),
       dtFim: new Date('2026-05-31T23:59:59.000Z'),
       taxaOperacional: 3.0,
       valorBolao: 30.0,
-      codigoCampanha: 'COPA2026-SEMI',
+      codigoCampanha: 'COPA-ALE-FRA',
       status: 'ENCERRADA',
       tipoCampanhaId: tipoEliminatorias.id,
     },
@@ -96,23 +103,8 @@ async function main() {
 
   const opcaoBrasil = await prisma.campanhaOpcao.create({
     data: {
-      descricao: 'Brasil campeão',
-      campanhaId: campanhaFinal.id,
-      status: 'ATIVO',
-    },
-  });
-
-  const opcaoArgentina = await prisma.campanhaOpcao.create({
-    data: {
-      descricao: 'Argentina campeã',
-      campanhaId: campanhaFinal.id,
-      status: 'ATIVO',
-    },
-  });
-
-  const opcaoFranca = await prisma.campanhaOpcao.create({
-    data: {
-      descricao: 'França campeã',
+      descricao: 'Vitória Brasil',
+      tipoResultado: 'VITORIA_TIME_A',
       campanhaId: campanhaFinal.id,
       status: 'ATIVO',
     },
@@ -120,7 +112,44 @@ async function main() {
 
   await prisma.campanhaOpcao.create({
     data: {
-      descricao: 'Alemanha vence',
+      descricao: 'Empate',
+      tipoResultado: 'EMPATE',
+      campanhaId: campanhaFinal.id,
+      status: 'ATIVO',
+    },
+  });
+
+  const opcaoArgentina = await prisma.campanhaOpcao.create({
+    data: {
+      descricao: 'Vitória Argentina',
+      tipoResultado: 'VITORIA_TIME_B',
+      campanhaId: campanhaFinal.id,
+      status: 'ATIVO',
+    },
+  });
+
+  await prisma.campanhaOpcao.create({
+    data: {
+      descricao: 'Vitória Alemanha',
+      tipoResultado: 'VITORIA_TIME_A',
+      campanhaId: campanhaEncerrada.id,
+      status: 'ATIVO',
+    },
+  });
+
+  await prisma.campanhaOpcao.create({
+    data: {
+      descricao: 'Empate',
+      tipoResultado: 'EMPATE',
+      campanhaId: campanhaEncerrada.id,
+      status: 'ATIVO',
+    },
+  });
+
+  await prisma.campanhaOpcao.create({
+    data: {
+      descricao: 'Vitória França',
+      tipoResultado: 'VITORIA_TIME_B',
       campanhaId: campanhaEncerrada.id,
       status: 'ATIVO',
     },
@@ -131,7 +160,7 @@ async function main() {
       usuarioId: usuario.id,
       campanhaOpcaoId: opcaoBrasil.id,
       meioPagamentoId: pix.id,
-      comprovante: 'comprovante-demo-001',
+      comprovante: COMPROVANTE_DEMO_BASE64,
       status: 'CONFIRMADA',
     },
   });

@@ -22,7 +22,9 @@ export const opcaoService = {
 
 export const apostaService = {
   list: () => api.get('/apostas'),
+  getById: (id) => api.get(`/apostas/${id}`),
   create: (payload) => api.post('/apostas', payload),
+  updateStatus: (id, status) => api.patch(`/apostas/${id}/status`, { status }),
 };
 
 export const tipoCampanhaService = {

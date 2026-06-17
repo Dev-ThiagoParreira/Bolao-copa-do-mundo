@@ -30,6 +30,12 @@ enum StatusAposta {
   CANCELADA
 }
 
+enum TipoResultadoJogo {
+  VITORIA_TIME_A
+  EMPATE
+  VITORIA_TIME_B
+}
+
 model TipoCampanha {
   id        Int        @id @default(autoincrement())
   descricao String
@@ -42,6 +48,8 @@ model TipoCampanha {
 model Campanha {
   id               Int            @id @default(autoincrement())
   nome             String
+  timeA            String?        @map("time_a")
+  timeB            String?        @map("time_b")
   dtInicio         DateTime       @map("dt_inicio")
   dtFim            DateTime       @map("dt_fim")
   taxaOperacional  Decimal        @map("taxa_operacional") @db.Decimal(10, 2)
@@ -56,12 +64,13 @@ model Campanha {
 }
 
 model CampanhaOpcao {
-  id               Int          @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   descricao        String
-  campanhaId       Int          @map("campanha_id")
-  ehResultadoFinal Boolean      @default(false) @map("eh_resultado_final")
-  status           StatusGeral  @default(ATIVO)
-  campanha         Campanha     @relation(fields: [campanhaId], references: [id])
+  campanhaId       Int                @map("campanha_id")
+  tipoResultado    TipoResultadoJogo? @map("tipo_resultado")
+  ehResultadoFinal Boolean            @default(false) @map("eh_resultado_final")
+  status           StatusGeral        @default(ATIVO)
+  campanha         Campanha           @relation(fields: [campanhaId], references: [id])
   apostas          Aposta[]
 
   @@unique([campanhaId, descricao])
@@ -96,7 +105,8 @@ model Aposta {
   id              Int           @id @default(autoincrement())
   usuarioId       Int           @map("usuario_id")
   dtCriacao       DateTime      @default(now()) @map("dt_criacao")
-  comprovante     String?
+  comprovante     String?       @db.Text
+  valorPago       Decimal?      @map("valor_pago") @db.Decimal(10, 2)
   meioPagamentoId Int           @map("meio_pagamento_id")
   campanhaOpcaoId Int           @map("campanha_opcao_id")
   status          StatusAposta  @default(PENDENTE)

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { campanhaService, apostaService } from '../services/resources.js';
 import { getErrorMessage } from '../services/api.js';
 import { useNotification } from '../context/NotificationContext.jsx';
+import { getConfrontoLabel } from '../utils/campanhaJogo.js';
 
 function formatDate(value) {
   return new Date(value).toLocaleDateString('pt-BR');
@@ -79,7 +80,7 @@ export default function DashboardPage() {
               <div className="card card-shadow calendar-card p-3">
                 <div className="d-flex justify-content-between align-items-start">
                   <div>
-                    <h5 className="mb-1">{campanha.nome}</h5>
+                    <h5 className="mb-1">{getConfrontoLabel(campanha)}</h5>
                     <small className="text-muted">{campanha.codigoCampanha}</small>
                   </div>
                   <span className={`badge bg-${campanha.status === 'ABERTA' ? 'success' : 'secondary'} badge-status`}>

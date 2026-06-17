@@ -1,5 +1,6 @@
 import prisma from '../../config/prisma.js';
 import { AppError } from '../../utils/response.js';
+import { buildNomeConfronto, buildOpcoesJogo } from '../../utils/campanhaJogo.js';
 
 function validatePeriodo(dtInicio, dtFim) {
   const inicio = new Date(dtInicio);
@@ -42,11 +43,35 @@ export async function create(data) {
   });
   if (codigoExistente) throw new AppError('Código de campanha já existe', 409);
 
+  const timeA = data.timeA?.trim();
+  const timeB = data.timeB?.trim();
+
+  if (!timeA || !timeB) {
+    throw new AppError('Informe os dois times do confronto', 400);
+  }
+
+  if (timeA.toLowerCase() === timeB.toLowerCase()) {
+    throw new AppError('Os times do confronto devem ser diferentes', 400);
+  }
+
+  const nome = data.nome?.trim() || buildNomeConfronto(timeA, timeB);
+  const opcoesJogo = buildOpcoesJogo(timeA, timeB);
+
   return prisma.campanha.create({
     data: {
-      ...data,
+      nome,
+      timeA,
+      timeB,
+      codigoCampanha: data.codigoCampanha,
+      taxaOperacional: data.taxaOperacional,
+      valorBolao: data.valorBolao,
+      status: data.status,
+      tipoCampanhaId: data.tipoCampanhaId,
       dtInicio: new Date(data.dtInicio),
       dtFim: new Date(data.dtFim),
+      opcoes: {
+        create: opcoesJogo,
+      },
     },
     include: { tipoCampanha: true, opcoes: true },
   });

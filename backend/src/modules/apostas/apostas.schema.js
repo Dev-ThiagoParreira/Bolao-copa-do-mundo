@@ -4,7 +4,13 @@ export const createApostaSchema = z.object({
   body: z.object({
     campanhaOpcaoId: z.coerce.number().int().positive(),
     meioPagamentoId: z.coerce.number().int().positive(),
-    comprovante: z.string().optional(),
+    comprovante: z
+      .string()
+      .optional()
+      .refine(
+        (value) => !value || value.startsWith('data:image/'),
+        'Comprovante deve ser uma imagem em base64 (data URL)'
+      ),
     status: z.enum(['PENDENTE', 'CONFIRMADA', 'CANCELADA']).optional(),
   }),
 });

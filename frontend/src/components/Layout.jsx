@@ -28,16 +28,16 @@ export default function Layout() {
               Campanhas
             </NavLink>
             <NavLink className="nav-link" to="/apostas">
-              Apostas
+              {isAdmin ? 'Validar apostas' : 'Apostas'}
             </NavLink>
             <NavLink className="nav-link" to="/perfil">
               Perfil
             </NavLink>
             {isAdmin && (
               <>
-                <NavLink className="nav-link" to="/admin/campanhas">
-                  Admin
-                </NavLink>
+            <NavLink className="nav-link" to="/admin/campanhas">
+              Jogos
+            </NavLink>
                 <NavLink className="nav-link" to="/admin/usuarios">
                   Usuários
                 </NavLink>

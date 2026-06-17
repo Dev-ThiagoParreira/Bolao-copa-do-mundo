@@ -1,5 +1,6 @@
 import prisma from '../../config/prisma.js';
 import { AppError } from '../../utils/response.js';
+import { sanitizarApostaParaLista, validarComprovanteImagem } from '../../utils/comprovante.js';
 import { campanhaAbertaParaAposta } from '../campanhas/campanhas.service.js';
 
 export async function list(user) {
@@ -17,7 +18,7 @@ export async function list(user) {
       },
     },
     orderBy: { dtCriacao: 'desc' },
-  });
+  }).then((apostas) => apostas.map(sanitizarApostaParaLista));
 }
 
 export async function getById(id, user) {
@@ -68,15 +69,21 @@ export async function create(data, userId) {
   }
 
   if (meioPagamento.comprovanteObrigatorio && !data.comprovante) {
-    throw new AppError('Comprovante é obrigatório para este meio de pagamento', 400);
+    throw new AppError('Comprovante em imagem é obrigatório para este meio de pagamento', 400);
   }
 
-  return prisma.aposta.create({
+  const comprovante = data.comprovante ? validarComprovanteImagem(data.comprovante) : null;
+
+  if (data.comprovante && !comprovante) {
+    throw new AppError('Comprovante inválido', 400);
+  }
+
+  const aposta = await prisma.aposta.create({
     data: {
       usuarioId: userId,
       campanhaOpcaoId: data.campanhaOpcaoId,
       meioPagamentoId: data.meioPagamentoId,
-      comprovante: data.comprovante,
+      comprovante,
       status: data.status || 'PENDENTE',
     },
     include: {
@@ -85,11 +92,18 @@ export async function create(data, userId) {
       campanhaOpcao: { include: { campanha: true } },
     },
   });
+
+  return sanitizarApostaParaLista(aposta);
 }
 
 export async function updateStatus(id, status, user) {
   const aposta = await getById(id, user);
-  return prisma.aposta.update({
+
+  if (status === 'CONFIRMADA' && aposta.meioPagamento.comprovanteObrigatorio && !aposta.comprovante) {
+    throw new AppError('Não é possível confirmar: comprovante PIX não enviado', 400);
+  }
+
+  const atualizada = await prisma.aposta.update({
     where: { id: aposta.id },
     data: { status },
     include: {
@@ -98,6 +112,8 @@ export async function updateStatus(id, status, user) {
       campanhaOpcao: { include: { campanha: true } },
     },
   });
+
+  return sanitizarApostaParaLista(atualizada);
 }
 
 export async function remove(id, user) {
